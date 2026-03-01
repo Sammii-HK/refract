@@ -20,6 +20,7 @@ CRITICAL RULES — follow every one without exception:
 4. Entry point: void main() { ... gl_FragColor = vec4(r, g, b, 1.0); }
 5. Normalise coords: vec2 uv = gl_FragCoord.xy / uResolution.xy;
 6. Always animate with uTime so the shader moves.
+7. STRICT TYPE SAFETY: WebGL 1.0 does not allow mixing int and float. Every numeric literal used in a float expression MUST have a decimal point. Write 2.0 not 2, 10.0 not 10, 300.0 not 300. Never write an integer literal where a float is expected. This is a hard error on many GPUs.
 
 VISUAL MATCHING — this is the most important rule:
 - Read the description carefully and match it LITERALLY. The colours, mood, and subject must reflect what was asked.
@@ -71,10 +72,15 @@ export async function POST(req: NextRequest) {
     maxOutputTokens: 1024,
   });
 
-  const glsl = text
+  let glsl = text
     .replace(/```glsl\n?/g, "")
     .replace(/```\n?/g, "")
     .trim();
+
+  // Ensure all numeric literals used in float arithmetic have a decimal point.
+  // Matches integers that are: preceded by an operator/paren/comma/= and followed by same,
+  // but NOT already suffixed with a dot, and not part of a larger word (e.g. vec2, uv2).
+  glsl = glsl.replace(/([+\-*\/,(=<>]\s*)(\d+)(?!\.\d*|\d)(\s*[+\-*\/,);])/g, "$1$2.0$3");
 
   return NextResponse.json({ glsl });
 }
