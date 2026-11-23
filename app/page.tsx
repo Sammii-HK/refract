@@ -47,7 +47,7 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const metadata = useRef({
     source: STUDIES[0].source as string,
-    label: `Hand-authored study: ${STUDIES[0].name}`,
+    label: `Study: ${STUDIES[0].name}`,
   });
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -208,8 +208,8 @@ export default function Home() {
               {loading ? "Requesting shader…" : "Generate shader"}
             </button>
             <p className="help">
-              Only Generate sends your description to the configured model.
-              Local studies and source editing do not call a model.
+              Generate writes a new fragment shader from your description.
+              Studies and edits run entirely in your browser.
             </p>
             {requestError && (
               <p className="error-message" role="alert">
@@ -218,9 +218,9 @@ export default function Home() {
             )}
           </div>
           <div className="brief-section">
-            <h2>Begin without a model</h2>
+            <h2>Or start from a study</h2>
             <p className="help">
-              Three hand-authored studies, ready to inspect and edit.
+              Three shaders I wrote by hand. Open one, then change the source.
             </p>
             <div className="study-list">
               {STUDIES.map((study) => (
@@ -230,7 +230,7 @@ export default function Home() {
                   onClick={() => {
                     setRequestError("");
                     setActionStatus("");
-                    apply(study.source, `Hand-authored study: ${study.name}`);
+                    apply(study.source, `Study: ${study.name}`);
                   }}
                 >
                   <span>{study.name}</span>
@@ -292,7 +292,7 @@ export default function Home() {
             <span>WebGL 2 · GLSL fragment source</span>
             <button disabled={!activeSource} onClick={download}>
               <Download size={15} aria-hidden />
-              Save valid shader
+              Save shader
             </button>
           </div>
           <section id="source" className="source-panel">
@@ -349,8 +349,8 @@ export default function Home() {
         </section>
       </main>
       <footer className="refract-footer">
-        A shader can compile successfully and still look different from the
-        brief. Inspect the result before using it.
+        Generated shaders compile here before they run. If one fails, the last
+        working shader keeps playing and the compiler log shows why.
       </footer>
     </div>
   );
