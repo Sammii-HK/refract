@@ -8,8 +8,9 @@
   --muted: #92919f;
   --accent: #c5b3ef;
   --accent-ink: #201a2b;
-  /* Control borders: inputs, chips, buttons, the source panel. */
-  --line: #ffffff14;
+  /* Control borders: inputs, chips, buttons, the source panel.
+     Opaque so they clear 3:1 against --bg and --surface. */
+  --line: #65627a;
   --code-bg: #0b0c10;
   --code-text: #bfb7d5;
   --error-border: #a36a7c60;
