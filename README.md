@@ -1,32 +1,23 @@
 # Refract
 
-A local shader workshop with a description-to-GLSL path, three hand-authored studies, an editable fragment source panel and a live GPU preview. The examples are labelled as authored source, not AI-generated output.
+A shader workshop. Describe a mood and generate a GLSL fragment shader, start from one of three hand-authored studies, or edit the source directly and watch it run on the GPU.
 
-Suggestions fill the brief. Only Generate submits it to the configured model. Local studies, source edits, pause, copying and shader downloads do not call a model. Generation must remain unexercised under the owner's current no-provider-spend instruction.
+## How it works
 
-## Preview behaviour
+- **Generate** sends the description to `/api/shader`, which asks Groq's `llama-3.3-70b-versatile` for a fragment shader. Without `GROQ_API_KEY` the route returns 503 and the rest of the workshop still works.
+- **Studies and source edits** run entirely in the browser.
+- **The preview** compiles and links new source before swapping it in. If a shader fails, the last valid one keeps running and the full compiler log is shown.
+- **Save valid shader** downloads the last source that compiled, never a broken draft.
 
-The preview checks compilation and linking before accepting source. It also checks the actual Three.js rendering pipeline before replacing the previous material. Invalid edits keep the last valid preview and its exportable source. Full compiler diagnostics remain available in a scrolling error panel. Reapplying the same invalid draft still validates and reports the error.
+Shaders use GLSL ES 1.00-style `gl_FragColor` with the uniforms `uTime`, `uResolution` and `uMouse`. The renderer is Three.js on WebGL 2. Frame rate is capped at 30fps and pixel ratio at 1.5; the preview pauses in hidden tabs and starts paused when reduced motion is requested.
 
-Pause freezes shader time. Hidden tabs stop scheduling frames. Drawing is capped at 30 frames per second and device pixel ratio at 1.5. Resolution uniforms use actual drawing-buffer dimensions. Old materials are disposed on replacement; geometry, observers, frame callbacks and renderer resources are released on unmount.
-
-The installed Three.js renderer requires WebGL 2. Shader source uses GLSL ES 1.00-style `gl_FragColor` and the uniforms `uTime`, `uResolution`, `uMouse`. Integer loop counters, array sizes and indexes are preserved. See [Three.js renderer documentation](https://threejs.org/docs/pages/WebGLRenderer) and [Khronos WebGL 2 shader-language support](https://registry.khronos.org/webgl/specs/latest/2.0/).
-
-## Generation boundary
-
-The existing route refers to Groq's `llama-3.3-70b-versatile`. Its live availability and output quality were not verified. Missing configuration returns 503 without contacting it. Malformed input returns 400; provider failures return a safe error; timeouts return 504. The route makes no automatic provider retries. Response normalisation removes a whole GLSL fence but never rewrites numeric literals.
-
-No environment files are needed for local authored-source work. Provider settings belong to the owner's existing platform configuration and must not be copied into this checkout.
-
-## Local checks
-
-Use Node 24 and the existing package manager:
+## Development
 
 ```sh
-pnpm test
-pnpm lint
-pnpm build
-pnpm exec next start --hostname 127.0.0.1 --port 4826
+npm install
+npm run dev
+npm test
+npm run build
 ```
 
-The tests inject provider, animation and GPU-resource IO. They do not request model output. The actual browser verification used only authored shaders and local edits. See [the verification record](docs/quality/refract-verification-20261120.md) for exact evidence and limits.
+`npm run build` runs the icon lint and a type check before `next build`.
